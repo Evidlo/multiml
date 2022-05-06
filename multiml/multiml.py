@@ -4,7 +4,7 @@ import numpy as np
 from tqdm import tqdm
 from skimage.transform import rescale, downscale_local_mean
 
-def correlate_and_sum(frames, mode='CC', disable_print=False, np=np):
+def correlate_and_sum(frames, mode='CC', disable_print=True, np=np):
     """Correlate all frame combinations and sum each group of correlations
 
     Args:
@@ -37,7 +37,7 @@ def correlate_and_sum(frames, mode='CC', disable_print=False, np=np):
     return np.fft.ifftn(np.array(product_sums), axes=image_axes).real
 
 
-def scale_and_sum(csums, scale_dir='down', disable_print=False):
+def scale_and_sum(csums, scale_dir='down', disable_print=True):
     """Scale each correlation group so peaks are incident, then crop and sum
 
     Args:
@@ -58,7 +58,7 @@ def scale_and_sum(csums, scale_dir='down', disable_print=False):
     scaled_csums = []
 
     for diff, csum in enumerate(
-            tqdm(csums, desc='Scale', leave=None, disable=disable_print),
+            tqdm(csums, desc='Scale', leave=None, disable=True),
             1
     ):
         # pretrim csum to relevant area to make scaling faster
@@ -89,7 +89,7 @@ def scale_and_sum(csums, scale_dir='down', disable_print=False):
     return result, np.array(scaled_csums)
 
 
-def register(frames, scale_dir='up', disable_print=False):
+def register(frames, scale_dir='down', disable_print=True):
     """Register frames with Multi ML method
 
     Args:
@@ -101,7 +101,16 @@ def register(frames, scale_dir='up', disable_print=False):
     csums = correlate_and_sum(frames, disable_print=disable_print)
     result, scaled = scale_and_sum(csums, scale_dir=scale_dir, disable_print=disable_print)
 
-    return np.array(np.unravel_index(np.argmax(result), result.shape))
+    return np.array(np.unravel_index(
+        np.argmax(result),
+        result.shape))
+
+    # # region to search for argmax assuming cK < N
+    # search_region = np.array(frames[0].shape) // len(frames) + (1, 1)
+
+    # return np.array(np.unravel_index(
+    #     np.argmax(result[:search_region[0], :search_region[1]]),
+    #     search_region))
 
 def shift_and_sum(frames, drift, mode='full', shift_method='roll'):
     """Coadd frames by given shift
@@ -133,7 +142,7 @@ def shift_and_sum(frames, drift, mode='full', shift_method='roll'):
     summation = np.zeros(frames_pad[0].shape, dtype='complex128')
     summation_scale = np.zeros(frames_pad[0].shape, dtype=int)
 
-    for time_diff, (frame, frame_ones) in tqdm(enumerate(zip(frames_pad, frames_ones))):
+    for time_diff, (frame, frame_ones) in enumerate(zip(frames_pad, frames_ones)):
         shift = np.array(drift) * (time_diff + 1)
         if shift_method == 'roll':
             integer_shift = np.floor(shift).astype(int)
@@ -153,7 +162,7 @@ def shift_and_sum(frames, drift, mode='full', shift_method='roll'):
         summation += shifted
         summation_scale += shifted_ones
 
-    summation /= summation_scale
+    summation /= len(frames)
 
     if mode == 'crop':
         summation = size_equalizer(
@@ -162,6 +171,7 @@ def shift_and_sum(frames, drift, mode='full', shift_method='roll'):
             2 * np.ceil(drift * (len(frames_pad)-1)).astype(int)
         )
     elif mode == 'full':
+        # FIXME: something wrong with full mode
         pass
     elif mode == 'first':
         summation_scale[summation_scale == 0] = 1
