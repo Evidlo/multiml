@@ -168,7 +168,7 @@ def shift_and_sum(frames, drift, mode='full', shift_method='roll'):
         summation = size_equalizer(
             summation,
             np.array(frames_pad[0].shape).astype(int) -
-            2 * np.ceil(drift * (len(frames_pad)-1)).astype(int)
+            np.ceil(drift * (len(frames_pad)-1)).astype(int)
         )
     elif mode == 'full':
         # FIXME: something wrong with full mode
