@@ -1,5 +1,9 @@
 # MultiML
 
+Fast image registration under linear drift with extreme noise.
+
+![](readme_picture.png)
+
 See associated paper [here](https://github.com/evidlo/ICIP2022).
 
 ## Install
