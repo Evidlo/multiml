@@ -1,6 +1,6 @@
 # MultiML
 
-Fast image registration under linear drift with extreme noise.
+Fast image registration under linear drift with extreme noise.  Optimal in maximum likelihood sense under Gaussian noise.
 
 ![](readme_picture.png)
 
