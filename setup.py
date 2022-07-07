@@ -22,7 +22,8 @@ setup(
     install_requires=[
         "numpy",
         "scikit-image",
-        "tqdm"
+        "tqdm",
+        "scipy"
     ],
     include_package_data=True,
     # automatically look for subfolders with __init__.py
