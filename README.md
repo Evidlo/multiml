@@ -2,7 +2,7 @@
 
 Fast image registration under linear drift with extreme noise.  Optimal in maximum likelihood sense under Gaussian noise.
 
-![](readme_picture.png)
+![](readme_picture.gif)
 
 See associated paper [here](https://github.com/evidlo/ICIP2022).
 
