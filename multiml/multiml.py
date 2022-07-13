@@ -89,14 +89,17 @@ def scale_and_sum(csums, scale_dir='down', disable_print=True):
     return result, np.array(scaled_csums)
 
 
-def register(frames, scale_dir='down', disable_print=True):
+def register(frames, scale_dir='down', disable_print=False):
     """Register frames with Multi ML method
 
     Args:
         frames (ndarray): stack of frames to register
         scale_dir (str): scale correlation groups 'up' (subpixel registration) or
-            'down'
+            'down' (whole pixel registration)
         disable_print (boolean): disable printing
+
+    Returns:
+        (ndarray): estimated drift
     """
     csums = correlate_and_sum(frames, disable_print=disable_print)
     result, scaled = scale_and_sum(csums, scale_dir=scale_dir, disable_print=disable_print)
